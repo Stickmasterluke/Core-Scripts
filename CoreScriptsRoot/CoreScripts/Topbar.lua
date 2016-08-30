@@ -37,9 +37,6 @@ local TOPBAR_LOCAL_CFRAME_3D = CFrame.new(0, -5, 5) * CFrame.Angles(math.rad(25)
 
 --[[ FFLAG VALUES ]]
 
-local defeatableTopbarSuccess, defeatableTopbarFlagValue = pcall(function() return settings():GetFFlag("EnableSetCoreTopbarEnabled") end)
-local defeatableTopbar = (defeatableTopbarSuccess and defeatableTopbarFlagValue == true)
-
 local vr3dGuisSuccess, vr3dGuisFlagValue = pcall(function() return settings():GetFFlag("RenderUserGuiIn3DSpace") end)
 local vr3dGuis = (vr3dGuisSuccess and vr3dGuisFlagValue == true)
 
@@ -72,13 +69,13 @@ local function isTopbarEnabled()
 	return topbarEnabled and not InputService.VREnabled
 end
 
-if defeatableTopbar then
-	StarterGui:RegisterSetCore("TopbarEnabled", function(enabled) -- registers a placeholder setcore function that keeps track of players enabling/disabling the topbar before it's ready.
-		if type(enabled) == "boolean" then
-			topbarEnabled = enabled
-		end
-	end)
-end
+
+StarterGui:RegisterSetCore("TopbarEnabled", function(enabled) -- registers a placeholder setcore function that keeps track of players enabling/disabling the topbar before it's ready.
+	if type(enabled) == "boolean" then
+		topbarEnabled = enabled
+	end
+end)
+
 local lookMenuEnabled = true
 
 local settingsActive = false
@@ -1887,17 +1884,14 @@ local function OnVREnabled(prop)
 end
 UISChanged = InputService.Changed:connect(OnVREnabled)
 
-if defeatableTopbar then
-	topbarEnabledChanged() -- if it was set before this point, enable/disable it now
-	StarterGui:RegisterSetCore("TopbarEnabled", function(enabled)
-		if type(enabled) == "boolean" then
-			topbarEnabled = enabled
-			topbarEnabledChanged()
-		end
-	end)
-else
-	topbarEnabledChanged()
-end
+topbarEnabledChanged() -- if it was set before this point, enable/disable it now
+StarterGui:RegisterSetCore("TopbarEnabled", function(enabled)
+	if type(enabled) == "boolean" then
+		topbarEnabled = enabled
+		topbarEnabledChanged()
+	end
+end)
+
 
 -- Hook-up coregui changing
 StarterGui.CoreGuiChangedSignal:connect(OnCoreGuiChanged)
